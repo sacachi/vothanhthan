@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "home": "HOME",
+    "work": "WORK",
+    "exhibitions": "EXHIBITIONS",
+    "artist": "ARTIST",
+    "news": "NEWS",
+    "contact": "CONTACT",
+    "videos": "VIDEOS"
+  },
+  "artist": {
+    "title": "Artist",
+    "profile": "Profile",
+    "born": "Born 1987 in Hue City, Vietnam",
+    "address": "Hue City, Thua Thien Hue Province",
+    "email": "Email",
+    "exhibitions": "Exhibitions",
+    "awards": "Awards",
+    "collections": "Collections",
+    "collectionsText": "Works are in the collections of the Vietnam Fine Arts Museum, Quang San Art Museum, Dogma, the Southeast Asian Contemporary Art Center in Shanghai, and private collections in Vietnam and abroad.",
+    "philosophy": "Artistic Philosophy",
+    "philosophyText": "The philosophy that runs through my practice is that art must truthfully reflect the nature of human beings and the life of the artist."
+  },
+  "contact": {
+    "title": "Contact",
+    "email": "Email",
+    "social": "Social Media"
+  }
+}

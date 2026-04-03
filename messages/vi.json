@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "home": "TRANG CHỦ",
+    "work": "TÁC PHẨM",
+    "exhibitions": "TRIỂN LÃM",
+    "artist": "NGHỆ SĨ",
+    "news": "TIN TỨC",
+    "contact": "LIÊN HỆ",
+    "videos": "VIDEO"
+  },
+  "artist": {
+    "title": "Nghệ Sĩ",
+    "profile": "Hồ Sơ",
+    "born": "Sinh năm 1987 tại thành phố Huế, Việt Nam",
+    "address": "Thành phố Huế, Tỉnh Thừa Thiên Huế",
+    "email": "Email",
+    "exhibitions": "Các Triển Lãm Đã Tham Gia",
+    "awards": "Giải Thưởng",
+    "collections": "Bộ Sưu Tập",
+    "collectionsText": "Có tranh trong bộ sưu tập của Bảo tàng Mỹ thuật Việt Nam, Bảo tàng Nghệ thuật Quang San, Dogma, Trung tâm Nghệ thuật Đương đại Đông Nam Á tại Thượng Hải và các bộ sưu tập tư nhân trong và ngoài nước.",
+    "philosophy": "Quan Điểm Nghệ Thuật",
+    "philosophyText": "Trong quá trình sáng tác, triết lý xuyên suốt mà tôi theo đuổi là nghệ thuật phải phản ánh đúng bản chất con người và cuộc sống của người nghệ sĩ."
+  },
+  "contact": {
+    "title": "Liên Hệ",
+    "email": "Email",
+    "social": "Mạng Xã Hội"
+  }
+}
