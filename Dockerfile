@@ -14,7 +14,6 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Generate Prisma client, then build Next.js
 RUN npx prisma generate
 RUN npm run build
 
@@ -27,29 +26,31 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
+# Prisma cần libc compatibility trên alpine
+RUN apk add --no-cache libc6-compat
+
 # Non-root user
 RUN addgroup -g 1001 -S nodejs \
- && adduser  -u 1001 -S nextjs -G nodejs
+ && adduser -u 1001 -S nextjs -G nodejs
 
-# Standalone Next.js output
+# Copy node_modules đầy đủ
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy Next standalone build
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static    ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public          ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
-# Prisma: migrations schema + query engine
-COPY --from=builder --chown=nextjs:nodejs /app/prisma                  ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma    ./node_modules/.prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma    ./node_modules/@prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma     ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/effect     ./node_modules/effect
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/bcryptjs   ./node_modules/bcryptjs
+# Prisma schema
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Writable dirs for SQLite DB and user uploads (mounted as volumes in production)
+# Runtime writable dirs
 RUN mkdir -p /data /app/public/uploads \
  && chown -R nextjs:nodejs /data /app/public/uploads
 
 USER nextjs
+
 EXPOSE 3000
 
-# Run migrations then start
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node prisma/seed.js && node server.js"]
+# Run migration + seed + start
+CMD ["sh", "-c", "npx prisma migrate deploy && node prisma/seed.js && node server.js"]
