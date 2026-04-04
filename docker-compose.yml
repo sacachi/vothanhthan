@@ -28,7 +28,13 @@ services:
     volumes:
       - db_data:/data                 # SQLite DB
       - uploads:/app/public/uploads  # user uploads
-
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
 volumes:
   db_data:
   uploads:
