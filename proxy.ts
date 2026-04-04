@@ -1,20 +1,19 @@
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
 
-export function proxy(req: NextRequest) {
+export const proxy = auth((req) => {
   const isLoginPage = req.nextUrl.pathname === "/admins/login";
-  if (isLoginPage) return NextResponse.next();
 
-  // Check for NextAuth session token (v5 uses authjs.session-token or next-auth.session-token)
-  const token =
-    req.cookies.get("authjs.session-token")?.value ||
-    req.cookies.get("next-auth.session-token")?.value;
-
-  if (!token) {
+  if (!req.auth && !isLoginPage) {
     return NextResponse.redirect(new URL("/admins/login", req.url));
   }
+
+  if (req.auth && isLoginPage) {
+    return NextResponse.redirect(new URL("/admins", req.url));
+  }
+
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/admins/:path*"],
