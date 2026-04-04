@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Images, Video, LogOut, ChevronRight, MessageSquare } from "lucide-react";
+import { LayoutGrid, Images, Video, LogOut, ChevronRight, MessageSquare, UserCircle } from "lucide-react";
 
 const NAV = [
   { href: "/admins", label: "Dashboard", icon: LayoutGrid, exact: true },
   { href: "/admins/galleries", label: "Galleries", icon: Images, exact: false },
   { href: "/admins/videos", label: "Videos", icon: Video, exact: false },
   { href: "/admins/contacts", label: "Contacts", icon: MessageSquare, exact: false },
+  { href: "/admins/profile", label: "Profile", icon: UserCircle, exact: false },
 ];
 
 export default function AdminSidebar() {

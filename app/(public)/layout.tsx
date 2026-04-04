@@ -1,10 +1,12 @@
 import { prisma } from "@/lib/db";
+import { auth } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getLocale } from "next-intl/server";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
+  const session = await auth();
 
   const [workGalleries, exhibitionGalleries] = await Promise.all([
     prisma.gallery.findMany({ where: { category: "work" }, orderBy: { order: "asc" } }),
@@ -17,6 +19,7 @@ export default async function PublicLayout({ children }: { children: React.React
         workGalleries={workGalleries}
         exhibitionGalleries={exhibitionGalleries}
         locale={locale}
+        isAdmin={!!session}
       />
       <main className="flex-1">{children}</main>
       <Footer />

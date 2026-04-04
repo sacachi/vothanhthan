@@ -5,6 +5,13 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  async rewrites() {
+    return {
+      beforeFiles: [
+        { source: "/uploads/:path*", destination: "/api/uploads/:path*" },
+      ],
+    };
+  },
   images: {
     localPatterns: [
       { pathname: "/slides/**" },

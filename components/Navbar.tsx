@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import LangSwitcher from "./LangSwitcher";
 import SocialIcons from "./SocialIcons";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard } from "lucide-react";
 
 type Gallery = { slug: string; nameEn: string; nameVi: string; category: string };
 
@@ -13,9 +13,10 @@ interface NavbarProps {
   workGalleries: Gallery[];
   exhibitionGalleries: Gallery[];
   locale: string;
+  isAdmin?: boolean;
 }
 
-export default function Navbar({ workGalleries, exhibitionGalleries, locale }: NavbarProps) {
+export default function Navbar({ workGalleries, exhibitionGalleries, locale, isAdmin }: NavbarProps) {
   const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const [workOpen, setWorkOpen] = useState(false);
@@ -75,6 +76,16 @@ export default function Navbar({ workGalleries, exhibitionGalleries, locale }: N
 
         <SocialIcons />
         <LangSwitcher locale={locale} />
+        {isAdmin && (
+          <Link
+            href="/admins"
+            className="flex items-center gap-1 text-white/50 hover:text-white transition-colors text-[10px] tracking-widest border border-white/20 hover:border-white/50 px-2.5 py-1 rounded"
+            title="Go to Dashboard"
+          >
+            <LayoutDashboard size={11} />
+            Admin
+          </Link>
+        )}
       </nav>
 
       {/* Mobile hamburger */}
@@ -105,6 +116,16 @@ export default function Navbar({ workGalleries, exhibitionGalleries, locale }: N
           <div className="flex items-center gap-4 pt-2">
             <SocialIcons />
             <LangSwitcher locale={locale} />
+            {isAdmin && (
+              <Link
+                href="/admins"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-1 text-white/50 hover:text-white transition-colors text-[10px] tracking-widest"
+              >
+                <LayoutDashboard size={12} />
+                Dashboard
+              </Link>
+            )}
           </div>
         </div>
       )}
