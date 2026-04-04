@@ -23,6 +23,7 @@ export default function AdminLoginPage() {
     if (result?.error) {
       setError("Invalid credentials");
     } else {
+      router.refresh();
       router.push("/admins");
     }
   }
