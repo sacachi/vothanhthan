@@ -28,11 +28,11 @@ ENV HOSTNAME=0.0.0.0
 
 # Prisma cần libc compatibility trên alpine
 RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache curl
 
 # Non-root user
 RUN addgroup -g 1001 -S nodejs \
  && adduser -u 1001 -S nextjs -G nodejs
-
 # Copy node_modules đầy đủ
 COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
