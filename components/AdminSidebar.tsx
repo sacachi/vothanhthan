@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, Images, Video, LogOut, ChevronRight, MessageSquare, UserCircle } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 const NAV = [
   { href: "/admins", label: "Dashboard", icon: LayoutGrid, exact: true },
@@ -48,15 +49,13 @@ export default function AdminSidebar() {
 
       {/* Sign out */}
       <div className="p-4 border-t border-zinc-800">
-        <form action="/api/auth/signout" method="POST">
-          <button
-            type="submit"
-            className="flex items-center gap-2 text-xs text-zinc-500 hover:text-white transition-colors w-full px-1 py-1"
-          >
-            <LogOut size={14} />
-            Sign Out
-          </button>
-        </form>
+        <button
+          onClick={() => signOut({ callbackUrl: "/admins/login" })}
+          className="flex items-center gap-2 text-xs text-zinc-500 hover:text-white transition-colors w-full px-1 py-1"
+        >
+          <LogOut size={14} />
+          Sign Out
+        </button>
       </div>
     </aside>
   );
