@@ -3,6 +3,7 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade } from "swiper/modules";
 import Image from "next/image";
+import Link from "next/link";
 import "swiper/css";
 import "swiper/css/effect-fade";
 
@@ -10,6 +11,7 @@ export interface Slide {
   src: string;
   title?: string;
   description?: string;
+  galleryHref?: string;
 }
 
 interface SlideshowProps {
@@ -37,8 +39,8 @@ export default function Slideshow({ slides }: SlideshowProps) {
                 className="object-cover"
                 priority={i === 0}
               />
-              {(slide.title || slide.description) && (
-                <div className="absolute bottom-16 left-0 right-0 flex justify-center pointer-events-none">
+              {(slide.title || slide.description || slide.galleryHref) && (
+                <div className="absolute bottom-16 left-0 right-0 flex flex-col items-center gap-3 pointer-events-none">
                   <div className="text-center px-6 max-w-xl">
                     {slide.title && (
                       <p className="text-white text-xs tracking-[0.3em] uppercase font-light drop-shadow-lg">
@@ -51,6 +53,14 @@ export default function Slideshow({ slides }: SlideshowProps) {
                       </p>
                     )}
                   </div>
+                  {slide.galleryHref && (
+                    <Link
+                      href={slide.galleryHref}
+                      className="pointer-events-auto text-white/60 hover:text-white text-[10px] tracking-[0.35em] uppercase border border-white/20 hover:border-white/50 px-4 py-1.5 transition-colors"
+                    >
+                      View Gallery
+                    </Link>
+                  )}
                 </div>
               )}
             </div>

@@ -42,6 +42,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
+# Override Prisma client with the schema-aware version generated in builder
+# (deps stage runs npm ci --ignore-scripts which skips prisma generate)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+
 # Runtime writable dirs
 RUN mkdir -p /data /app/public/uploads \
  && chown -R nextjs:nodejs /data /app/public/uploads

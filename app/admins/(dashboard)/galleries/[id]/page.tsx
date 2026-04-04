@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import Lightbox from "yet-another-react-lightbox";
+import "yet-another-react-lightbox/styles.css";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -19,10 +21,11 @@ type GalleryImage = {
 };
 type Gallery = { id: number; nameEn: string; nameVi: string; slug: string; category: string };
 
-function SortableImage({ image, onDelete, onUpdate }: {
+function SortableImage({ image, onDelete, onUpdate, onPreview }: {
   image: GalleryImage;
   onDelete: (id: number) => void;
   onUpdate: (id: number, data: Partial<GalleryImage>) => void;
+  onPreview: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: image.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
@@ -54,7 +57,7 @@ function SortableImage({ image, onDelete, onUpdate }: {
 
   return (
     <div ref={setNodeRef} style={style} className="relative group bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex flex-col">
-      <div className="relative aspect-square overflow-hidden">
+      <div className="relative aspect-square overflow-hidden cursor-zoom-in" onClick={onPreview}>
         <Image src={`/uploads/${image.filename}`} alt={image.alt} fill unoptimized className="object-cover" />
         {/* Drag handle */}
         <div className="absolute top-1 left-1 cursor-grab text-white drop-shadow bg-black/30 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity" {...attributes} {...listeners}>
@@ -104,6 +107,7 @@ export default function GalleryImagesPage({ params }: { params: Promise<{ id: st
   const [gallery, setGallery] = useState<Gallery | null>(null);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(-1);
 
   useEffect(() => {
     params.then(({ id }) => setGalleryId(Number(id)));
@@ -193,13 +197,25 @@ export default function GalleryImagesPage({ params }: { params: Promise<{ id: st
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {images.map((img) => (
-                <SortableImage key={img.id} image={img} onDelete={handleDelete} onUpdate={handleUpdate} />
+              {images.map((img, idx) => (
+                <SortableImage key={img.id} image={img} onDelete={handleDelete} onUpdate={handleUpdate} onPreview={() => setPreviewIndex(idx)} />
               ))}
             </div>
           </SortableContext>
         </DndContext>
       )}
+
+      <Lightbox
+        open={previewIndex >= 0}
+        close={() => setPreviewIndex(-1)}
+        index={previewIndex}
+        slides={images.map((img) => ({
+          src: `/uploads/${img.filename}`,
+          title: img.title || undefined,
+          description: img.description || undefined,
+        }))}
+        styles={{ container: { backgroundColor: "rgba(0,0,0,0.97)" } }}
+      />
     </div>
   );
 }

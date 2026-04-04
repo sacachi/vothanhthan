@@ -20,13 +20,22 @@ export default async function Home() {
     const featured = await prisma.image.findMany({
       where: { featured: true },
       orderBy: { order: "asc" },
+      include: { gallery: { select: { slug: true, category: true } } },
     });
     if (featured.length > 0) {
-      slides = featured.map((img) => ({
-        src: `/uploads/${img.filename}`,
-        title: img.title || undefined,
-        description: img.description || undefined,
-      }));
+      slides = featured.map((img) => {
+        let galleryHref: string | undefined;
+        if (img.gallery) {
+          const base = img.gallery.category === "work" ? "work" : "exhibitions";
+          galleryHref = `/${base}/${img.gallery.slug}`;
+        }
+        return {
+          src: `/uploads/${img.filename}`,
+          title: img.title || undefined,
+          description: img.description || undefined,
+          galleryHref,
+        };
+      });
     }
   } catch {
     // DB not yet migrated — fall back to static slides
