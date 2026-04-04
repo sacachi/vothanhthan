@@ -1,40 +1,43 @@
 version: "3.9"
 
 services:
-  migrate:
-    build: .
-    command: sh -c "npx prisma migrate deploy && node prisma/seed.js"
-    volumes:
-      - db_data:/data
-
   web:
     build: .
+    image: myapp:latest
     container_name: nextjs-app
     restart: unless-stopped
+
     expose:
       - "3000"
+
     depends_on:
-      - migrate
+      migrate:
+        condition: service_completed_successfully
+
     environment:
       NODE_ENV: production
-
-      # Prisma SQLite
       DATABASE_URL: file:/data/db.sqlite
-
-      # NextAuth (nếu dùng)
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
       NEXTAUTH_URL: ${NEXTAUTH_URL}
 
     volumes:
-      - db_data:/data                 # SQLite DB
-      - uploads:/app/public/uploads  # user uploads
-      
+      - db_data:/data
+      - uploads:/app/public/uploads
+
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 20s
+
+  migrate:
+    image: myapp:latest
+    command: sh -c "npx prisma migrate deploy && node prisma/seed.js"
+    restart: "no"
+    volumes:
+      - db_data:/data
+
 volumes:
   db_data:
   uploads:
