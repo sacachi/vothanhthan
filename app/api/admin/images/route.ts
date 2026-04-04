@@ -48,12 +48,36 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(created, { status: 201 });
 }
 
-// PATCH reorder images
+// PATCH: reorder (body: { ids }) OR update single image metadata (body: { id, title?, description?, featured?, alt? })
 export async function PATCH(req: NextRequest) {
   const authError = await requireAuth();
   if (authError) return authError;
 
-  const { ids }: { ids: number[] } = await req.json();
+  const body = await req.json();
+
+  // Single image metadata update
+  if ("id" in body) {
+    const { id, title, description, featured, alt } = body as {
+      id: number;
+      title?: string;
+      description?: string;
+      featured?: boolean;
+      alt?: string;
+    };
+    const image = await prisma.image.update({
+      where: { id },
+      data: {
+        ...(title !== undefined && { title }),
+        ...(description !== undefined && { description }),
+        ...(featured !== undefined && { featured }),
+        ...(alt !== undefined && { alt }),
+      },
+    });
+    return NextResponse.json(image);
+  }
+
+  // Batch reorder
+  const { ids }: { ids: number[] } = body;
   await Promise.all(ids.map((id, i) => prisma.image.update({ where: { id }, data: { order: i } })));
   return NextResponse.json({ ok: true });
 }

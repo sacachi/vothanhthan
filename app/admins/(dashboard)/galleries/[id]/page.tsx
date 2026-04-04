@@ -6,28 +6,95 @@ import Link from "next/link";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Trash2, Upload, ArrowLeft } from "lucide-react";
+import { GripVertical, Trash2, Upload, ArrowLeft, Star } from "lucide-react";
 
-type GalleryImage = { id: number; filename: string; alt: string; order: number };
+type GalleryImage = {
+  id: number;
+  filename: string;
+  alt: string;
+  title: string;
+  description: string;
+  featured: boolean;
+  order: number;
+};
 type Gallery = { id: number; nameEn: string; nameVi: string; slug: string; category: string };
 
-function SortableImage({ image, onDelete }: { image: GalleryImage; onDelete: (id: number) => void }) {
+function SortableImage({ image, onDelete, onUpdate }: {
+  image: GalleryImage;
+  onDelete: (id: number) => void;
+  onUpdate: (id: number, data: Partial<GalleryImage>) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: image.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
+  const [title, setTitle] = useState(image.title);
+  const [description, setDescription] = useState(image.description);
+  const [saving, setSaving] = useState(false);
+
+  async function saveMetadata() {
+    if (title === image.title && description === image.description) return;
+    setSaving(true);
+    await fetch("/api/admin/images", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: image.id, title, description }),
+    });
+    onUpdate(image.id, { title, description });
+    setSaving(false);
+  }
+
+  async function toggleFeatured() {
+    const featured = !image.featured;
+    await fetch("/api/admin/images", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: image.id, featured }),
+    });
+    onUpdate(image.id, { featured });
+  }
+
   return (
-    <div ref={setNodeRef} style={style} className="relative group bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+    <div ref={setNodeRef} style={style} className="relative group bg-gray-100 rounded-lg overflow-hidden border border-gray-200 flex flex-col">
       <div className="relative aspect-square overflow-hidden">
         <Image src={`/uploads/${image.filename}`} alt={image.alt} fill unoptimized className="object-cover" />
+        {/* Drag handle */}
+        <div className="absolute top-1 left-1 cursor-grab text-white drop-shadow bg-black/30 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity" {...attributes} {...listeners}>
+          <GripVertical size={14} />
+        </div>
+        {/* Delete */}
+        <button
+          onClick={() => onDelete(image.id)}
+          title="Delete image"
+          className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 text-white rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <Trash2 size={14} />
+        </button>
+        {/* Featured toggle */}
+        <button
+          onClick={toggleFeatured}
+          title="Hiện trên slideshow trang chủ"
+          className={`absolute bottom-1 right-1 rounded p-0.5 transition-colors ${image.featured ? "text-yellow-400 bg-black/40" : "text-white/40 bg-black/20 opacity-0 group-hover:opacity-100"}`}
+        >
+          <Star size={14} fill={image.featured ? "currentColor" : "none"} />
+        </button>
       </div>
-      <div className="absolute top-1 left-1 cursor-grab text-white drop-shadow bg-black/30 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity" {...attributes} {...listeners}>
-        <GripVertical size={14} />
+      {/* Metadata fields */}
+      <div className="p-2 space-y-1 bg-white">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={saveMetadata}
+          placeholder="Tên tác phẩm…"
+          className="w-full text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:border-gray-400"
+        />
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          onBlur={saveMetadata}
+          placeholder="Chất liệu, kích thước, năm…"
+          className="w-full text-xs border border-gray-200 rounded px-2 py-1 focus:outline-none focus:border-gray-400 text-gray-500"
+        />
+        {saving && <span className="text-[10px] text-gray-400">Saving…</span>}
       </div>
-      <button
-        onClick={() => onDelete(image.id)}
-        className="absolute top-1 right-1 bg-red-500/80 hover:bg-red-600 text-white rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <Trash2 size={14} />
-      </button>
     </div>
   );
 }
@@ -70,6 +137,10 @@ export default function GalleryImagesPage({ params }: { params: Promise<{ id: st
     await load();
   }
 
+  function handleUpdate(id: number, data: Partial<GalleryImage>) {
+    setImages((prev) => prev.map((img) => img.id === id ? { ...img, ...data } : img));
+  }
+
   async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
@@ -110,7 +181,7 @@ export default function GalleryImagesPage({ params }: { params: Promise<{ id: st
           {uploading ? "Uploading..." : "Upload Images"}
           <input type="file" accept="image/*" multiple onChange={handleUpload} className="hidden" disabled={uploading} />
         </label>
-        <span className="ml-3 text-xs text-gray-400">Drag to reorder after upload</span>
+        <span className="ml-3 text-xs text-gray-400">Drag to reorder · ☆ để hiện trên slideshow trang chủ</span>
       </div>
 
       {/* Sortable image grid */}
@@ -121,9 +192,9 @@ export default function GalleryImagesPage({ params }: { params: Promise<{ id: st
       ) : (
         <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={images.map((i) => i.id)} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
               {images.map((img) => (
-                <SortableImage key={img.id} image={img} onDelete={handleDelete} />
+                <SortableImage key={img.id} image={img} onDelete={handleDelete} onUpdate={handleUpdate} />
               ))}
             </div>
           </SortableContext>

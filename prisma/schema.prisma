@@ -26,12 +26,15 @@ model Gallery {
 }
 
 model Image {
-  id        Int     @id @default(autoincrement())
-  galleryId Int
-  gallery   Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
-  filename  String
-  alt       String  @default("")
-  order     Int     @default(0)
+  id          Int     @id @default(autoincrement())
+  galleryId   Int
+  gallery     Gallery @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+  filename    String
+  alt         String  @default("")
+  title       String  @default("")
+  description String  @default("")
+  featured    Boolean @default(false)
+  order       Int     @default(0)
 }
 
 model Video {

@@ -6,8 +6,14 @@ import Image from "next/image";
 import "swiper/css";
 import "swiper/css/effect-fade";
 
+export interface Slide {
+  src: string;
+  title?: string;
+  description?: string;
+}
+
 interface SlideshowProps {
-  slides: string[];
+  slides: Slide[];
 }
 
 export default function Slideshow({ slides }: SlideshowProps) {
@@ -20,16 +26,33 @@ export default function Slideshow({ slides }: SlideshowProps) {
         loop
         className="w-full h-full"
       >
-        {slides.map((src, i) => (
+        {slides.map((slide, i) => (
           <SwiperSlide key={i}>
             <div className="relative w-full h-full">
               <Image
-                src={src}
-                alt={`Slide ${i + 1}`}
+                src={slide.src}
+                alt={slide.title || `Slide ${i + 1}`}
                 fill
+                unoptimized={slide.src.startsWith("/uploads/")}
                 className="object-cover"
                 priority={i === 0}
               />
+              {(slide.title || slide.description) && (
+                <div className="absolute bottom-16 left-0 right-0 flex justify-center pointer-events-none">
+                  <div className="text-center px-6 max-w-xl">
+                    {slide.title && (
+                      <p className="text-white text-xs tracking-[0.3em] uppercase font-light drop-shadow-lg">
+                        {slide.title}
+                      </p>
+                    )}
+                    {slide.description && (
+                      <p className="text-white/70 text-[11px] tracking-widest mt-1 drop-shadow font-light">
+                        {slide.description}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </SwiperSlide>
         ))}
