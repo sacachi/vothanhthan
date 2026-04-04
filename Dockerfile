@@ -34,14 +34,12 @@ RUN addgroup -g 1001 -S nodejs \
  && adduser -u 1001 -S nextjs -G nodejs
 
 # Copy node_modules đầy đủ
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules ./node_modules
 
 # Copy Next standalone build
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
-
-# Prisma schema
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
 # Runtime writable dirs
