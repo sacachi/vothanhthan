@@ -32,27 +32,27 @@ export default function GalleryGrid({ images }: { images: GalleryImage[] }) {
         {images.map((img, i) => (
           <div
             key={img.id}
-            className="mb-2 break-inside-avoid cursor-pointer overflow-hidden group"
+            className="mb-4 break-inside-avoid cursor-pointer group"
             onClick={() => setIndex(i)}
           >
-            <div className="relative w-full">
-              <Image
-                src={`/uploads/${img.filename}`}
-                alt={img.alt || ""}
-                width={800}
-                height={600}
-                unoptimized
-                className="w-full h-auto object-cover group-hover:opacity-90 transition-opacity"
-              />
-              {img.title && (
-                <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/60 to-transparent px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <p className="text-white text-xs tracking-wider">{img.title}</p>
-                  {img.description && (
-                    <p className="text-white/70 text-[10px] mt-0.5">{img.description}</p>
-                  )}
-                </div>
-              )}
-            </div>
+            <Image
+              src={`/uploads/${img.filename}`}
+              alt={img.alt || ""}
+              width={800}
+              height={600}
+              unoptimized
+              className="w-full h-auto object-cover group-hover:opacity-90 transition-opacity"
+            />
+            {(img.title || img.description) && (
+              <div className="pt-2 pb-1">
+                {img.title && (
+                  <p className="text-xs tracking-[0.15em] uppercase text-gray-800">{img.title}</p>
+                )}
+                {img.description && (
+                  <p className="text-[11px] text-gray-400 mt-0.5 leading-relaxed">{img.description}</p>
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

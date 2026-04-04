@@ -15,18 +15,22 @@ const STATIC_SLIDES: Slide[] = [
 ].map((src) => ({ src }));
 
 export default async function Home() {
-  const featured = await prisma.image.findMany({
-    where: { featured: true },
-    orderBy: { order: "asc" },
-  });
-
-  const slides: Slide[] = featured.length > 0
-    ? featured.map((img) => ({
+  let slides: Slide[] = STATIC_SLIDES;
+  try {
+    const featured = await prisma.image.findMany({
+      where: { featured: true },
+      orderBy: { order: "asc" },
+    });
+    if (featured.length > 0) {
+      slides = featured.map((img) => ({
         src: `/uploads/${img.filename}`,
         title: img.title || undefined,
         description: img.description || undefined,
-      }))
-    : STATIC_SLIDES;
+      }));
+    }
+  } catch {
+    // DB not yet migrated — fall back to static slides
+  }
 
   return (
     <>

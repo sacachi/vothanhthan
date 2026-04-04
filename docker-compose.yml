@@ -35,6 +35,8 @@ services:
     image: myapp:latest
     command: sh -c "npx prisma migrate deploy && node prisma/seed.js"
     restart: "no"
+    environment:
+      DATABASE_URL: file:/data/db.sqlite
     volumes:
       - db_data:/data
 
