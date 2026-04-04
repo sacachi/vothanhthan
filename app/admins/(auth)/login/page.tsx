@@ -2,10 +2,8 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,8 +21,7 @@ export default function AdminLoginPage() {
     if (result?.error) {
       setError("Invalid credentials");
     } else {
-      router.refresh();
-      router.push("/admins");
+      window.location.replace("/admins");
     }
   }
 
