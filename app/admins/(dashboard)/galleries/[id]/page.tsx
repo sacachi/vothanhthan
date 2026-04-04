@@ -17,7 +17,7 @@ function SortableImage({ image, onDelete }: { image: GalleryImage; onDelete: (id
   return (
     <div ref={setNodeRef} style={style} className="relative group bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
       <div className="relative aspect-square overflow-hidden">
-        <Image src={`/uploads/${image.filename}`} alt={image.alt} fill className="object-cover" />
+        <Image src={`/uploads/${image.filename}`} alt={image.alt} fill unoptimized className="object-cover" />
       </div>
       <div className="absolute top-1 left-1 cursor-grab text-white drop-shadow bg-black/30 rounded p-0.5 opacity-0 group-hover:opacity-100 transition-opacity" {...attributes} {...listeners}>
         <GripVertical size={14} />
