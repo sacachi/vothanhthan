@@ -49,6 +49,4 @@ RUN mkdir -p /data /app/public/uploads \
 USER nextjs
 
 EXPOSE 3000
-
-# Run migration + seed + start
-CMD ["sh", "-c", "npx prisma migrate deploy && node prisma/seed.js && node server.js"]
+CMD ["node", "server.js"]
